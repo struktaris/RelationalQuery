@@ -116,6 +116,10 @@ public extension RelationalQueryCondition {
                 }
             }
             return false
+        case .always:
+            return true
+        case .never:
+            return false
         }
     }
     

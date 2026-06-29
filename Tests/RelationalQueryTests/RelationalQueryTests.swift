@@ -11,11 +11,30 @@ final class RelationalQueryTests: XCTestCase {
         // `all`
         // ###########
         
-        // `all` with sevaral conditions:
+        // -----------------------------
+        // `all` with sevaral condition:
+        // -----------------------------
+        
+        // a) at top level:
         do {
             let query = RelationalQuery(
                 table: "person",
-                condition: one {
+                condition: all {
+                    // sevaral conditions:
+                    compare(textField: "prename", withTemplate: "H%", usingWildcard: "%")
+                    compare(textField: "prename", withTemplate: "%s", usingWildcard: "%")
+                }
+            )
+            
+            XCTAssertEqual(query.sql, "SELECT * FROM person WHERE (prename LIKE 'H%' AND prename LIKE '%s')")
+            XCTAssertEqual(query.postgrest, "person?and=(prename.like.H*,prename.like.*s)")
+        }
+        // b) at lower level:
+        do {
+            let query = RelationalQuery(
+                table: "person",
+                condition: all {
+                    .always
                     all {
                         // sevaral conditions:
                         compare(textField: "prename", withTemplate: "H%", usingWildcard: "%")
@@ -24,19 +43,21 @@ final class RelationalQueryTests: XCTestCase {
                 }
             )
             
-            XCTAssertEqual(query.sql, "SELECT * FROM person WHERE (prename LIKE 'H%' AND prename LIKE '%s')")
-            XCTAssertEqual(query.postgrest, "person?and=(prename.like.H*,prename.like.*s)")
+            XCTAssertEqual(query.sql, "SELECT * FROM person WHERE (TRUE AND (prename LIKE 'H%' AND prename LIKE '%s'))")
+            XCTAssertEqual(query.postgrest, "person?and=(true,and(prename.like.H*,prename.like.*s))")
         }
         
+        // -----------------------------
         // `all` with only one condition:
+        // -----------------------------
+        
+        // a) at top level:
         do {
             let query = RelationalQuery(
                 table: "person",
-                condition: one {
-                    all {
-                        // only one condition:
-                        compare(textField: "prename", withValue: "Hans")
-                    }
+                condition: all {
+                    // only one condition:
+                    compare(textField: "prename", withValue: "Hans")
                 }
             )
             
@@ -44,14 +65,33 @@ final class RelationalQueryTests: XCTestCase {
             XCTAssertEqual(query.postgrest, "person?prename=eq.Hans")
         }
         
-        // `all` without condition:
+        // b) at lower level:
         do {
             let query = RelationalQuery(
                 table: "person",
-                condition: one {
+                condition: all {
+                    .always
                     all {
-                        // no condition
+                        // only one condition:
+                        compare(textField: "prename", withValue: "Hans")
                     }
+                }
+            )
+            
+            XCTAssertEqual(query.sql, "SELECT * FROM person WHERE (TRUE AND prename='Hans')")
+            XCTAssertEqual(query.postgrest, "person?and=(true,prename.eq.Hans)")
+        }
+        
+        // -----------------------------
+        // `all` without condition:
+        // -----------------------------
+        
+        // a) at top level:
+        do {
+            let query = RelationalQuery(
+                table: "person",
+                condition: all {
+                    // no condition
                 }
             )
             
@@ -59,15 +99,51 @@ final class RelationalQueryTests: XCTestCase {
             XCTAssertEqual(query.postgrest, "person?true")
         }
         
+        // b) at lower level:
+        do {
+            let query = RelationalQuery(
+                table: "person",
+                condition: all {
+                    .always
+                    all {
+                        // no condition
+                    }
+                }
+            )
+            
+            XCTAssertEqual(query.sql, "SELECT * FROM person WHERE (TRUE AND TRUE)")
+            XCTAssertEqual(query.postgrest, "person?and=(true,true)")
+        }
+        
         // ###########
         // `one`
         // ###########
         
+        // -----------------------------
         // `one` with sevaral conditions:
+        // -----------------------------
+        
+        // a) at top level:
         do {
             let query = RelationalQuery(
                 table: "person",
                 condition: one {
+                    // sevaral conditions:
+                    compare(textField: "prename", withTemplate: "H%", usingWildcard: "%")
+                    compare(textField: "prename", withTemplate: "%s", usingWildcard: "%")
+                }
+            )
+            
+            XCTAssertEqual(query.sql, "SELECT * FROM person WHERE (prename LIKE 'H%' OR prename LIKE '%s')")
+            XCTAssertEqual(query.postgrest, "person?or=(prename.like.H*,prename.like.*s)")
+        }
+        
+        // b) at lower level:
+        do {
+            let query = RelationalQuery(
+                table: "person",
+                condition: all {
+                    .always
                     one {
                         // sevaral conditions:
                         compare(textField: "prename", withTemplate: "H%", usingWildcard: "%")
@@ -76,19 +152,21 @@ final class RelationalQueryTests: XCTestCase {
                 }
             )
             
-            XCTAssertEqual(query.sql, "SELECT * FROM person WHERE (prename LIKE 'H%' OR prename LIKE '%s')")
-            XCTAssertEqual(query.postgrest, "person?or=(prename.like.H*,prename.like.*s)")
+            XCTAssertEqual(query.sql, "SELECT * FROM person WHERE (TRUE AND (prename LIKE 'H%' OR prename LIKE '%s'))")
+            XCTAssertEqual(query.postgrest, "person?and=(true,or(prename.like.H*,prename.like.*s))")
         }
         
-        // `one` with only one condition:s
+        // -----------------------------
+        // `one` with only one condition:
+        // -----------------------------
+        
+        // a) at top level:
         do {
             let query = RelationalQuery(
                 table: "person",
                 condition: one {
-                    one {
-                        // only one condition:
-                        compare(textField: "prename", withValue: "Hans")
-                    }
+                    // only one condition:
+                    compare(textField: "prename", withValue: "Hans")
                 }
             )
             
@@ -96,19 +174,55 @@ final class RelationalQueryTests: XCTestCase {
             XCTAssertEqual(query.postgrest, "person?prename=eq.Hans")
         }
         
+        // b) at lower level:
+        do {
+            let query = RelationalQuery(
+                table: "person",
+                condition:
+                    all {
+                        .always
+                        one {
+                            // only one condition:
+                            compare(textField: "prename", withValue: "Hans")
+                        }
+                    }
+            )
+            
+            XCTAssertEqual(query.sql, "SELECT * FROM person WHERE (TRUE AND prename='Hans')")
+            XCTAssertEqual(query.postgrest, "person?and=(true,prename.eq.Hans)")
+        }
+        
+        // -----------------------------
         // `one` without condition:
+        // -----------------------------
+        
+        // a) at top level:
         do {
             let query = RelationalQuery(
                 table: "person",
                 condition: one {
+                    // no condition
+                }
+            )
+            
+            XCTAssertEqual(query.sql, "SELECT * FROM person WHERE FALSE")
+            XCTAssertEqual(query.postgrest, "person?false")
+        }
+        
+        // b) at lower level:
+        do {
+            let query = RelationalQuery(
+                table: "person",
+                condition: all {
+                    .always
                     one {
                         // no condition
                     }
                 }
             )
             
-            XCTAssertEqual(query.sql, "SELECT * FROM person WHERE FALSE")
-            XCTAssertEqual(query.postgrest, "person?false")
+            XCTAssertEqual(query.sql, "SELECT * FROM person WHERE (TRUE AND FALSE)")
+            XCTAssertEqual(query.postgrest, "person?and=(true,false)")
         }
     }
     

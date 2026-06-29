@@ -81,6 +81,10 @@ extension RelationalQueryCondition: PostgRESTConvertible {
             case 1: conditions.first!.postgrest(topLevel: topLevel)
             default: "or\(topLevel ? "=" : "")(\(conditions.map{ $0.postgrest(topLevel: false) }.joined(separator: ",")))"
             }
+        case .always:
+            "true"
+        case .never:
+            "false"
         }
     }
     

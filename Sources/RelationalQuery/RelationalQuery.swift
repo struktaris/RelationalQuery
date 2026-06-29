@@ -27,6 +27,8 @@ public indirect enum RelationalQueryCondition: Sendable, Codable {
     case not(condition: RelationalQueryCondition)
     case and(conditions: [RelationalQueryCondition])
     case or(conditions: [RelationalQueryCondition])
+    case always
+    case never
 }
 
 public func compare(textField field: String, withValue value: String) -> RelationalQueryCondition {

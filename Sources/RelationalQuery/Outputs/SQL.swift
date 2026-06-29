@@ -75,6 +75,10 @@ extension RelationalQueryCondition: SQLConvertible {
             case 1: conditions.first!.sql
             default: "(" + conditions.map{ $0.sql }.joined(separator: " OR ") + ")"
             }
+        case .always:
+            "TRUE"
+        case .never:
+            "FALSE"
         }
     }
     
