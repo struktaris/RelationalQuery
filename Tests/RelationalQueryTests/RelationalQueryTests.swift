@@ -11,9 +11,9 @@ final class RelationalQueryTests: XCTestCase {
         // `all`
         // ###########
         
-        // -----------------------------
-        // `all` with sevaral condition:
-        // -----------------------------
+        // ------------------------------
+        // `all` with several conditions:
+        // ------------------------------
         
         // a) at top level:
         do {
@@ -47,9 +47,9 @@ final class RelationalQueryTests: XCTestCase {
             XCTAssertEqual(query.postgrest, "person?and=(true,and(prename.like.H*,prename.like.*s))")
         }
         
-        // -----------------------------
+        // ------------------------------
         // `all` with only one condition:
-        // -----------------------------
+        // ------------------------------
         
         // a) at top level:
         do {
@@ -82,9 +82,9 @@ final class RelationalQueryTests: XCTestCase {
             XCTAssertEqual(query.postgrest, "person?and=(true,prename.eq.Hans)")
         }
         
-        // -----------------------------
-        // `all` without condition:
-        // -----------------------------
+        // ------------------------------
+        // `all` without any condition:
+        // ------------------------------
         
         // a) at top level:
         do {
@@ -119,9 +119,9 @@ final class RelationalQueryTests: XCTestCase {
         // `one`
         // ###########
         
-        // -----------------------------
-        // `one` with sevaral conditions:
-        // -----------------------------
+        // ------------------------------
+        // `one` with several conditions:
+        // ------------------------------
         
         // a) at top level:
         do {
@@ -156,9 +156,9 @@ final class RelationalQueryTests: XCTestCase {
             XCTAssertEqual(query.postgrest, "person?and=(true,or(prename.like.H*,prename.like.*s))")
         }
         
-        // -----------------------------
+        // ------------------------------
         // `one` with only one condition:
-        // -----------------------------
+        // ------------------------------
         
         // a) at top level:
         do {
@@ -192,9 +192,9 @@ final class RelationalQueryTests: XCTestCase {
             XCTAssertEqual(query.postgrest, "person?and=(true,prename.eq.Hans)")
         }
         
-        // -----------------------------
-        // `one` without condition:
-        // -----------------------------
+        // ------------------------------
+        // `one` without any condition:
+        // ------------------------------
         
         // a) at top level:
         do {
