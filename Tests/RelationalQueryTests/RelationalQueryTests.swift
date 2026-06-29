@@ -5,6 +5,113 @@ import XCTest
 
 final class RelationalQueryTests: XCTestCase {
     
+    func testAndOrEmptyOrWithSingleElement() {
+        
+        // ###########
+        // `all`
+        // ###########
+        
+        // `all` with sevaral conditions:
+        do {
+            let query = RelationalQuery(
+                table: "person",
+                condition: one {
+                    all {
+                        // sevaral conditions:
+                        compare(textField: "prename", withTemplate: "H%", usingWildcard: "%")
+                        compare(textField: "prename", withTemplate: "%s", usingWildcard: "%")
+                    }
+                }
+            )
+            
+            XCTAssertEqual(query.sql, "SELECT * FROM person WHERE (prename LIKE 'H%' AND prename LIKE '%s')")
+            XCTAssertEqual(query.postgrest, "person?and=(prename.like.H*,prename.like.*s)")
+        }
+        
+        // `all` with only one condition:
+        do {
+            let query = RelationalQuery(
+                table: "person",
+                condition: one {
+                    all {
+                        // only one condition:
+                        compare(textField: "prename", withValue: "Hans")
+                    }
+                }
+            )
+            
+            XCTAssertEqual(query.sql, "SELECT * FROM person WHERE prename='Hans'")
+            XCTAssertEqual(query.postgrest, "person?prename=eq.Hans")
+        }
+        
+        // `all` without condition:
+        do {
+            let query = RelationalQuery(
+                table: "person",
+                condition: one {
+                    all {
+                        // no condition
+                    }
+                }
+            )
+            
+            XCTAssertEqual(query.sql, "SELECT * FROM person WHERE TRUE")
+            XCTAssertEqual(query.postgrest, "person?true")
+        }
+        
+        // ###########
+        // `one`
+        // ###########
+        
+        // `one` with sevaral conditions:
+        do {
+            let query = RelationalQuery(
+                table: "person",
+                condition: one {
+                    one {
+                        // sevaral conditions:
+                        compare(textField: "prename", withTemplate: "H%", usingWildcard: "%")
+                        compare(textField: "prename", withTemplate: "%s", usingWildcard: "%")
+                    }
+                }
+            )
+            
+            XCTAssertEqual(query.sql, "SELECT * FROM person WHERE (prename LIKE 'H%' OR prename LIKE '%s')")
+            XCTAssertEqual(query.postgrest, "person?or=(prename.like.H*,prename.like.*s)")
+        }
+        
+        // `one` with only one condition:s
+        do {
+            let query = RelationalQuery(
+                table: "person",
+                condition: one {
+                    one {
+                        // only one condition:
+                        compare(textField: "prename", withValue: "Hans")
+                    }
+                }
+            )
+            
+            XCTAssertEqual(query.sql, "SELECT * FROM person WHERE prename='Hans'")
+            XCTAssertEqual(query.postgrest, "person?prename=eq.Hans")
+        }
+        
+        // `one` without condition:
+        do {
+            let query = RelationalQuery(
+                table: "person",
+                condition: one {
+                    one {
+                        // no condition
+                    }
+                }
+            )
+            
+            XCTAssertEqual(query.sql, "SELECT * FROM person WHERE FALSE")
+            XCTAssertEqual(query.postgrest, "person?false")
+        }
+    }
+    
     func testQueryConstructionAndJSON() throws {
         
         let checkSurnameEndForD = true

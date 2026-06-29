@@ -27,6 +27,10 @@ public func notAll(@RelationalQueryConditionsBuilder builder: () -> [RelationalQ
 @resultBuilder
 public struct RelationalQueryConditionsBuilder {
     
+    public static func buildBlock() -> [RelationalQueryCondition] {
+        return []
+    }
+    
     public static func buildBlock(_ components: RelationalQueryCondition...) -> [RelationalQueryCondition] {
         return components
     }

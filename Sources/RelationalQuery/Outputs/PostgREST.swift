@@ -70,9 +70,17 @@ extension RelationalQueryCondition: PostgRESTConvertible {
         case .not(let condition):
             "not\(topLevel ? "=" : ".")\(condition.postgrest(topLevel: false))"
         case .and(let conditions):
-            "and\(topLevel ? "=" : "")(\(conditions.map{ $0.postgrest(topLevel: false) }.joined(separator: ",")))"
+            switch conditions.count {
+            case 0: "true"
+            case 1: conditions.first!.postgrest
+            default: "and\(topLevel ? "=" : "")(\(conditions.map{ $0.postgrest(topLevel: false) }.joined(separator: ",")))"
+            }
         case .or(let conditions):
-            "or\(topLevel ? "=" : "")(\(conditions.map{ $0.postgrest(topLevel: false) }.joined(separator: ",")))"
+            switch conditions.count {
+            case 0: "false"
+            case 1: conditions.first!.postgrest
+            default: "or\(topLevel ? "=" : "")(\(conditions.map{ $0.postgrest(topLevel: false) }.joined(separator: ",")))"
+            }
         }
     }
     

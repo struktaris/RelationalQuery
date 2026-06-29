@@ -47,6 +47,8 @@ PostgREST:
 person?select=surname:name,prename&or=(prename.eq.Bert,prename.like.C*,and(name.like.D*,name.like.*n,prename.eq.Ernie))&order=name,prename.desc"
 ```
 
+Note that `all` without any condition is always true, and `one` without any condition is always false.
+
 New output formats can easily be added, see the extensions for `SQLConvertible` and `PostgRESTConvertible`.
 
 ## Testing a query

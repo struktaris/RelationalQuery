@@ -64,9 +64,17 @@ extension RelationalQueryCondition: SQLConvertible {
         case .not(let condition):
             "NOT \(condition.sql)"
         case .and(let conditions):
-            "(" + conditions.map{ $0.sql }.joined(separator: " AND ") + ")"
+            switch conditions.count {
+            case 0: "TRUE"
+            case 1: conditions.first!.sql
+            default: "(" + conditions.map{ $0.sql }.joined(separator: " AND ") + ")"
+            }
         case .or(let conditions):
-            "(" + conditions.map{ $0.sql }.joined(separator: " OR ") + ")"
+            switch conditions.count {
+            case 0: "FALSE"
+            case 1: conditions.first!.sql
+            default: "(" + conditions.map{ $0.sql }.joined(separator: " OR ") + ")"
+            }
         }
     }
     
