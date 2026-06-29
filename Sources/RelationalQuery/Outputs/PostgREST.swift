@@ -72,13 +72,13 @@ extension RelationalQueryCondition: PostgRESTConvertible {
         case .and(let conditions):
             switch conditions.count {
             case 0: "true"
-            case 1: conditions.first!.postgrest
+            case 1: conditions.first!.postgrest(topLevel: topLevel)
             default: "and\(topLevel ? "=" : "")(\(conditions.map{ $0.postgrest(topLevel: false) }.joined(separator: ",")))"
             }
         case .or(let conditions):
             switch conditions.count {
             case 0: "false"
-            case 1: conditions.first!.postgrest
+            case 1: conditions.first!.postgrest(topLevel: topLevel)
             default: "or\(topLevel ? "=" : "")(\(conditions.map{ $0.postgrest(topLevel: false) }.joined(separator: ",")))"
             }
         }
